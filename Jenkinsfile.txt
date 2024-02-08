@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+    
+    stages {
+        
+        stage("checkout") {
+            // On peut mettre "parallel" a la place de "steps" si on veut que cette execution soit effectué en parallel
+            steps {
+                git branch:'main', url: 'https://github.com/EdemAMEGBETO/conference_app'
+            }
+        }
+    
+        stage("build") {
+            steps{
+                sh "./mvnw package"
+            }
+        }
+    
+        stage("capture") {
+            steps{
+                archiveArtifacts artifacts: '**/target/*.jar'
+                jacoco()
+                junit '**/target/surefire-reports/TEST*.xml'
+            }
+        }
+    }
+    
+    Post {
+        // On peut utiliser "regression" a se niveau à la place de "always" si la construction actuelle est mauvaise que la précédente il nous le dira
+        always {
+            emailext body: "${env.BUILD_URL}\n${currentBuild.absoluteUrl}",
+            to: 'skalampai@gmail.com',
+            recipientProviders: [previous()],
+            subject: "${currentBuild.currentResult}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+        }
+    }
+}
