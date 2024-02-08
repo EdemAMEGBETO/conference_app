@@ -3,12 +3,12 @@ pipeline {
     
     stages {
         
-        stage("checkout") {
+       // stage("checkout") {
             // On peut mettre "parallel" a la place de "steps" si on veut que cette execution soit effectué en parallel
-            steps {
+       //     steps {
                 git branch:'main', url: 'https://github.com/EdemAMEGBETO/conference_app'
-            }
-        }
+       //     }
+       // }
     
         stage("build") {
             steps{
